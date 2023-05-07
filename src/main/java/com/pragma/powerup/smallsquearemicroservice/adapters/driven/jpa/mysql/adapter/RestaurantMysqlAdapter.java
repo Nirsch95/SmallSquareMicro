@@ -1,5 +1,6 @@
 package com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.adapter;
 
+import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.exceptions.RestaurantAlreadyExistsException;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.mappers.IRestaurantEntityMapper;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.repositories.IRestaurantRepository;
 import com.pragma.powerup.smallsquearemicroservice.domain.model.Restaurant;
@@ -15,6 +16,9 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
 
     @Override
     public void saveRestaurant(Restaurant restaurant) {
+        if (restaurantRepository.findByDniNumber(restaurant.getDniNumber()).isPresent()) {
+            throw new RestaurantAlreadyExistsException();
+        }
         restaurantRepository.save(restaurantEntityMapper.toEntity(restaurant));
     }
 }

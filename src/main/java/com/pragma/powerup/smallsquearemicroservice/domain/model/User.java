@@ -3,6 +3,7 @@ package com.pragma.powerup.smallsquearemicroservice.domain.model;
 import java.util.Date;
 
 public class User {
+    private Long id;
     private String name;
     private String surname;
     private String dniNumber;
@@ -13,6 +14,26 @@ public class User {
     private Long idRole;
 
     public User() {
+    }
+
+    public User(Long id,String name, String surname, String dniNumber, String phone, Date birthdate, String mail, String password, Long idRole) {
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.dniNumber = dniNumber;
+        this.phone = phone;
+        this.birthdate = birthdate;
+        this.mail = mail;
+        this.password = password;
+        this.idRole = idRole;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
