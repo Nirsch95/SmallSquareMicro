@@ -9,6 +9,7 @@ import com.pragma.powerup.smallsquearemicroservice.domain.usecase.RestaurantUseC
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @RequiredArgsConstructor
@@ -20,8 +21,13 @@ public class BeanConfiguration {
     public IRestaurantServicePort restaurantServicePort() {
         return new RestaurantUseCase(restaurantPersistencePort());
     }
+
     @Bean
     public IRestaurantPersistencePort restaurantPersistencePort() {
         return new RestaurantMysqlAdapter(restaurantRepository, restaurantEntityMapper);
+    }
+    @Bean
+    public RestTemplate getRestTemplate() {
+        return new RestTemplate();
     }
 }

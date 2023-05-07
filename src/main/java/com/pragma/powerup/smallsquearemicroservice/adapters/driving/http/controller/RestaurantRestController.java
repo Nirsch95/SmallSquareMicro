@@ -1,5 +1,6 @@
 package com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.request.RestaurantRequestDto;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.handlers.IRestaurantHandler;
 import com.pragma.powerup.smallsquearemicroservice.configuration.Constants;
@@ -20,7 +21,7 @@ import java.util.Collections;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/smallsquare")
+@RequestMapping("/restaurant")
 @RequiredArgsConstructor
 public class RestaurantRestController {
     private final IRestaurantHandler restaurantHandler;
@@ -33,7 +34,7 @@ public class RestaurantRestController {
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error"))),
             })
     @PostMapping("/createRestaurant")
-    public ResponseEntity<Map<String, String>> saveRestaurant(@Valid @RequestBody RestaurantRequestDto restaurantRequestDto) {
+    public ResponseEntity<Map<String, String>> saveRestaurant(@Valid @RequestBody RestaurantRequestDto restaurantRequestDto){
         restaurantHandler.saveRestaurant(restaurantRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.RESTAURANT_CREATED_MESSAGE));

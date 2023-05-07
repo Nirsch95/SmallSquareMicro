@@ -3,6 +3,7 @@ package com.pragma.powerup.smallsquearemicroservice.configuration;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.exceptions.NoDataFoundException;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.exceptions.RestaurantAlreadyExistsException;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.exceptions.RestaurantNotFoundException;
+import com.pragma.powerup.smallsquearemicroservice.domain.exceptions.UserNotBeAOwnerException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -52,5 +53,12 @@ public class ControllerAdvisor {
             RestaurantNotFoundException restaurantNotFoundException) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, RESTAURANT_NOT_FOUND_MESSAGE));
+    }
+
+    @ExceptionHandler(UserNotBeAOwnerException.class)
+    public ResponseEntity<Map<String, String>> handleUserNotBeAOwnerException(
+            UserNotBeAOwnerException userNotBeAOwnerException) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, USER_NOT_A_OWNER_MESSAGE));
     }
 }
