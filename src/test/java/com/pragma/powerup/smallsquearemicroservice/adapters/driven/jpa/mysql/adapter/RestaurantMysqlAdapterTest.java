@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class RestaurantMysqlAdapterTest {
+class RestaurantMysqlAdapterTest {
 
     private RestaurantMysqlAdapter adapter;
 
@@ -32,7 +32,7 @@ public class RestaurantMysqlAdapterTest {
     }
 
     @Test
-    public void saveRestaurant_shouldSaveIfNotExists() {
+    void saveRestaurant_shouldSaveIfNotExists() {
         // Arrange
         Restaurant restaurant = new Restaurant();
         restaurant.setDniNumber("123456789");
@@ -46,7 +46,7 @@ public class RestaurantMysqlAdapterTest {
     }
 
     @Test
-    public void saveRestaurant_shouldThrowExceptionIfExists() {
+    void saveRestaurant_shouldThrowExceptionIfExists() {
         // Arrange
         Restaurant restaurant = new Restaurant();
         restaurant.setDniNumber("123456789");

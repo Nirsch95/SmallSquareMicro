@@ -1,6 +1,6 @@
 package com.pragma.powerup.smallsquearemicroservice.domain.usecase;
 
-import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.controller.UserRestController;
+import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.adapter.RestTemplateAdapter;
 import com.pragma.powerup.smallsquearemicroservice.configuration.Constants;
 import com.pragma.powerup.smallsquearemicroservice.domain.exceptions.UserNotBeAOwnerException;
 import com.pragma.powerup.smallsquearemicroservice.domain.model.Restaurant;
@@ -25,7 +25,7 @@ class RestaurantUseCaseTest {
     @Mock
     private IRestaurantPersistencePort restaurantPersistencePort;
     @Mock
-    private UserRestController userRestController;
+    private RestTemplateAdapter restTemplateAdapter;
     @InjectMocks
     private RestaurantUseCase restaurantUseCase;
 
@@ -35,7 +35,7 @@ class RestaurantUseCaseTest {
     }
 
     @Test
-    public void testSaveRestaurant()  {
+    void testSaveRestaurant()  {
         // Arrange
         User user = new User(10L,"Lili", "Gallego","lili@gmail.com","288383",
                 new Date(10, 3, 4),"12345","123456", Constants.OWNER_ROLE_ID);
@@ -47,7 +47,7 @@ class RestaurantUseCaseTest {
                 user.getId(), "199191919");
 
 
-        when(userRestController.getUser(10L)).thenReturn(user);
+        when(restTemplateAdapter.getUser(10L)).thenReturn(user);
         restaurantPersistencePort.saveRestaurant(restaurant);
         // Act
         restaurantUseCase.saveRestaurant(restaurant);
@@ -57,15 +57,15 @@ class RestaurantUseCaseTest {
     }
 
     @Test
-    public void saveRestaurant_invalidRoleUser() {
+    void saveRestaurant_invalidRoleUser() {
         // Arrange
         Restaurant restaurant = new Restaurant();
         restaurant.setIdOwner(123L);
 
         User user = new User();
-        user.setIdRole(456L); // Rol incorrecto
+        user.setIdRole(456L);
 
-        when(userRestController.getUser(123L)).thenReturn(user);
+        when(restTemplateAdapter.getUser(123L)).thenReturn(user);
 
         try {
             // Act
@@ -73,11 +73,9 @@ class RestaurantUseCaseTest {
             fail("Expected UserNotBeAOwnerException to be thrown");
         } catch (UserNotBeAOwnerException ex) {
             // Assert
-            // Verifica que se haya lanzado la excepción correctamente
             assertEquals("UserNotBeAOwnerException", ex.getClass().getSimpleName());
         }
 
-        // Verifica que no se haya llamado al método saveRestaurant
         verify(restaurantPersistencePort, never()).saveRestaurant(any(Restaurant.class));
     }
 }
