@@ -26,4 +26,16 @@ public class Constants {
     public static final String SWAGGER_LICENSE_URL_MESSAGE = "http://springdoc.org";
     public static final String SWAGGER_TERMS_OF_SERVICE_MESSAGE = "http://swagger.io/terms/";
     public static final String USER_NOT_A_OWNER_MESSAGE = "The user is not a Owner";
+    public static final String USER_NOT_FOUND_MESSAGE = "The user is not found";
+    public static final String USER_NOT_FOUND_MICROSERVER_DOWN_MESSAGE = "The user is not found, microservice down";
+    public static final String DISH_ALREADY_EXISTS_MESSAGE = "A Dish already exists with that name";
+    public static final String DISH_CREATED_MESSAGE = "Dish created successfully";
+    public static final String DISH_UPDATED_MESSAGE = "Dish updated successfully";
+    public static final String DISH_NOT_FOUND_MESSAGE = "Dish is not found";
+    public static final String CATEGORY_CREATED_MESSAGE = "Category created successfully";
+    public static final String CATEGORY_ALREADY_EXISTS_MESSAGE = "A Category already exists with that name";
+    public static final String EMPTY_FIELD_MESSAGE = "The field cannot be empty";
+    public static final String INVALID_FORMAT_PHONE_MESSAGE = "Invalid format phone";
+    public static final String INVALID_VALUE_DNI_NUMBER = "The ID number cannot have more than 20 digits.";
+    public static final String INVALID_FORMAT_NAME_MESSAGE = "Invalid format name";
 }

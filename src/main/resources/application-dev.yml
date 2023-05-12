@@ -20,3 +20,7 @@ management:
       exposure:
         include: "*"
 
+my:
+  variables:
+    url: "http://localhost:8090/user/"
+
