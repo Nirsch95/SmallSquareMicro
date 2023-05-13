@@ -43,4 +43,19 @@ class DishUseCaseTest {
         verify(dishPersistencePort).saveDish(dish);
         assertTrue(dish.getActive(), "Dish is active");
     }
+
+    @Test
+    void updateDish_ShouldUpdateDish() {
+        // Arrange
+        Long id = 1L;
+        Dish dish = new Dish();
+        dish.setDescription("This is a test dish.");
+        dish.setPrice("15000");
+
+        // Act
+        dishUseCase.updateDish(id, dish);
+
+        // Assert
+        verify(dishPersistencePort).updateDish(id, dish);
+    }
 }

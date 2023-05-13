@@ -2,6 +2,7 @@ package com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.contro
 
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.request.CategoryRequestDto;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.request.DishRequestDto;
+import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.request.DishUpdateRequestDto;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.handlers.IDishHandler;
 import com.pragma.powerup.smallsquearemicroservice.configuration.Constants;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +31,8 @@ class DishRestControllerTest {
 
     private DishRequestDto dishRequestDto;
 
+    private DishUpdateRequestDto dishUpdateRequestDto;
+
     @BeforeEach
     void setUp() {
         DishRequestDto dto = new DishRequestDto("DogHouse", 1L, "Fast Food", 1000, 1L, "restaurante/image.com");
@@ -37,7 +40,7 @@ class DishRestControllerTest {
 
     @Test
     @DisplayName("Given a valid dish, when saveDish is called, then a CREATED response is returned")
-    void testSaveCategory() {
+    void testSaveDish() {
         // Arrange
         Mockito.doNothing().when(dishHandler).saveDish(dishRequestDto);
 
@@ -47,5 +50,19 @@ class DishRestControllerTest {
         // Assert
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertEquals(Constants.DISH_CREATED_MESSAGE, responseEntity.getBody().get(Constants.RESPONSE_MESSAGE_KEY));
+    }
+
+    @Test
+    @DisplayName("Given a valid dish, when saveDish is called, then a CREATED response is returned")
+    void testUpdateDish() {
+        // Arrange
+        Mockito.doNothing().when(dishHandler).updateDish(1L, dishRequestDto);
+
+        // Act
+        ResponseEntity<Map<String, String>> responseEntity = dishRestController.updateDish(1L, dishRequestDto);
+
+        // Assert
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(Constants.DISH_UPDATED_MESSAGE, responseEntity.getBody().get(Constants.RESPONSE_MESSAGE_KEY));
     }
 }

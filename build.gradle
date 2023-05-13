@@ -51,10 +51,13 @@ jacocoTestReport {
 	afterEvaluate {
 		classDirectories.setFrom(files(classDirectories.files.collect{
 			fileTree(dir: it, exclude: ['com/pragma/powerup/smallsquearemicroservice/configuration',
-										'com/pragma/powerup/smallsquearemicroservice/adapters/driven/jpa/mysql/mappers',
+										'com/pragma/powerup/smallsquearemicroservice/adapters/driven/jpa',
 										'com/pragma/powerup/smallsquearemicroservice/adapters/driving/http/mapper',
 										'com/pragma/powerup/smallsquearemicroservice/domain/model',
-										'com/pragma/powerup/smallsquearemicroservice/adapters/driving/http/dto/response'])
+										'com/pragma/powerup/smallsquearemicroservice/adapters/driving/http/dto/response',
+										'com/pragma/powerup/smallsquearemicroservice/adapters/driving/http/handlers',
+										'com/pragma/powerup/smallsquearemicroservice/adapters/driving/http/exceptions',
+										'com/pragma/powerup/smallsquearemicroservice/adapters/driving/http/adapter'])
 		}))
 	}
 }
