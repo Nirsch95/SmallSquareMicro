@@ -53,9 +53,41 @@ To get a local copy up and running follow these steps.
 ## Usage
 
 1. Right-click the class PowerUpApplication and choose Run
-2. Open [http://localhost:8090/swagger-ui/index.html](http://localhost:8090/swagger-ui/index.html) in your web browser
+2. Open [http://localhost:8091/swagger-ui/index.html](http://localhost:8091/swagger-ui/index.html) in your web browser
 
 <!-- ROADMAP -->
 ## Tests
 
 - Right-click the test folder and choose Run tests with coverage
+
+## Proyect Structure
+
+### Configuration Layer
+
+It is the outermost layer and is responsible for security configuration using Spring Security and JWT, class assignment, dependency injection, exception usage and bean configurations.
+
+### Adapters Layer
+
+This layer contains two layers: the driven layer and the driven layer, which are responsible for all reception and adaptation by the client or server.
+
+#### Drivin Layer
+
+It is the user's entry point when connecting to the application, it allows the user to interact with the api.
+
+### Domain Layer
+
+It is the most internal module of the architecture, it belongs to the domain layer and encapsulates the business logic and rules.
+
+## Entry Points
+
+### Restaurant Controller
+
+![image](https://github.com/Nirsch95/SmallSquareMicro/assets/37886668/dda5cdd3-5ee3-4df2-9b87-90d0ef2c0a9d)
+
+- Create Restaurant
+
+![image](https://github.com/Nirsch95/SmallSquareMicro/assets/37886668/3d643c4d-57ea-4366-a692-df458d557bd0)
+
+## Author
+
+[@Nirsch95](https://github.com/Nirsch95) - Andrés Castro :wolf:
