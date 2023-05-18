@@ -7,6 +7,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IDishRepository extends JpaRepository<DishEntity, Long> {
-    Optional<DishEntity> findByName(String name);
-    List<DishEntity> findAllById(Long idRestaurant);
+    List<DishEntity> findAllByRestaurantEntityId(Long idRestaurant);
 }
