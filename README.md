@@ -82,11 +82,31 @@ It is the most internal module of the architecture, it belongs to the domain lay
 
 ### Restaurant Controller
 
-![image](https://github.com/Nirsch95/SmallSquareMicro/assets/37886668/dda5cdd3-5ee3-4df2-9b87-90d0ef2c0a9d)
+![image](https://github.com/Nirsch95/SmallSquareMicro/assets/37886668/d485f5f1-1a00-485f-8c38-740fb6d29212)
 
 - Create Restaurant
 
-![image](https://github.com/Nirsch95/SmallSquareMicro/assets/37886668/3d643c4d-57ea-4366-a692-df458d557bd0)
+![image](https://github.com/Nirsch95/SmallSquareMicro/assets/37886668/d1de4e1b-4992-4e24-8e2a-1f8b8a201f07)
+
+### Dish Controller
+
+![image](https://github.com/Nirsch95/SmallSquareMicro/assets/37886668/3df8603b-ceec-4e63-a65b-5dd08df687f0)
+
+- Create Dish
+
+![image](https://github.com/Nirsch95/SmallSquareMicro/assets/37886668/cc54da26-6ea3-4bc6-aef9-f940cffcad4c)
+
+- Update Dish
+
+![image](https://github.com/Nirsch95/SmallSquareMicro/assets/37886668/2b68b7a8-ae3a-4254-a3da-9251b013ed4d)
+
+### Category Controller
+
+![image](https://github.com/Nirsch95/SmallSquareMicro/assets/37886668/a6525668-20b7-4500-8270-ec63da3419f9)
+
+- Create Category
+
+![image](https://github.com/Nirsch95/SmallSquareMicro/assets/37886668/9f90ba26-0bea-458d-b00a-f374a8954a5f)
 
 ## Author
 
