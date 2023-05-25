@@ -38,4 +38,7 @@ public class Constants {
     public static final String INVALID_FORMAT_PHONE_MESSAGE = "Invalid format phone";
     public static final String INVALID_VALUE_DNI_NUMBER = "The ID number cannot have more than 20 digits.";
     public static final String INVALID_FORMAT_NAME_MESSAGE = "Invalid format name";
+    public static final String INVALID_USER_TO_CREATE_UPDATE_DISH = "This user is not the owner of this restaurant";
+    public static final String INVALID_TOKEN_MESSAGE = "Invalid token";
+    public static final String UNALLOWED_USER_TO_USE_ENDPOINT = "This user is not allowed to use this endpoint";
 }

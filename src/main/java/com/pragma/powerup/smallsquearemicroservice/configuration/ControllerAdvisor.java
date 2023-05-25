@@ -3,6 +3,9 @@ package com.pragma.powerup.smallsquearemicroservice.configuration;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.exceptions.*;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.exceptions.UserNotFoundException;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.exceptions.UserNotFoundMicroserviceDownException;
+import com.pragma.powerup.smallsquearemicroservice.configuration.interceptor.exception.InvalidTokenException;
+import com.pragma.powerup.smallsquearemicroservice.configuration.interceptor.exception.UserIsNotAllowedException;
+import com.pragma.powerup.smallsquearemicroservice.domain.exceptions.UserDontHaveThisRestaurantException;
 import com.pragma.powerup.smallsquearemicroservice.domain.exceptions.UserNotBeAOwnerException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -95,5 +98,26 @@ public class ControllerAdvisor {
             CategoryAlreadyExistsException categoryAlreadyExistsException) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, CATEGORY_ALREADY_EXISTS_MESSAGE));
+    }
+
+    @ExceptionHandler(UserDontHaveThisRestaurantException.class)
+    public ResponseEntity<Map<String, String>> handleUserDontHaveThisRestaurantException(
+            UserDontHaveThisRestaurantException userDontHaveThisRestaurantException) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INVALID_USER_TO_CREATE_UPDATE_DISH));
+    }
+
+    @ExceptionHandler(UserIsNotAllowedException.class)
+    public ResponseEntity<Map<String, String>> handleUserIsNotAllowedException(
+            UserIsNotAllowedException userIsNotAllowedException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, UNALLOWED_USER_TO_USE_ENDPOINT));
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidTokenException(
+            InvalidTokenException invalidTokenException) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INVALID_TOKEN_MESSAGE));
     }
 }

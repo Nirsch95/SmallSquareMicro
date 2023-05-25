@@ -18,7 +18,8 @@ public class DishMysqlAdapter implements IDishPersistencePort {
 
     @Override
     public void saveDish(Dish dish) {
-        if (dishRepository.findByName(dish.getName()).isPresent()){
+        boolean dishExists = dishRepository.existsByNameAndRestaurantEntityId(dish.getName(), dish.getRestaurant().getId());
+        if (dishExists) {
             throw new DishAlreadyExistsException();
         }
         dishRepository.save(dishEntityMapper.toEntity(dish));
