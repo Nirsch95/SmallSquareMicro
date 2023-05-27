@@ -5,4 +5,5 @@ import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.req
 public interface IDishHandler {
     void saveDish(DishRequestDto dishRequestDto);
     void updateDish(Long id,DishRequestDto dishRequestDto);
+    void changeStateDish(Long id);
 }

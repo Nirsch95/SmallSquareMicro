@@ -79,7 +79,12 @@ public class JwtInterceptor implements HandlerInterceptor {
         endpointRoles.put("/dish", owner);
         endpointRoles.put("/restaurant", admin);
 
-        String allowedRole = endpointRoles.get(requestURI);
-        return allowedRole != null && allowedRole.equals(role);
+        for(String endpoint : endpointRoles.keySet()) {
+            if(requestURI.startsWith(endpoint)) {
+                String allowedRole = endpointRoles.get(endpoint);
+                return allowedRole.equals(role);
+            }
+        }
+        return false;
     }
 }
