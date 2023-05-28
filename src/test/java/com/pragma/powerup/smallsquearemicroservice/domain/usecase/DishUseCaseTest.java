@@ -1,38 +1,31 @@
 package com.pragma.powerup.smallsquearemicroservice.domain.usecase;
 
-import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.entity.CategoryEntity;
-import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.entity.DishEntity;
-import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.entity.RestaurantEntity;
+
 import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.exceptions.RestaurantNotFoundException;
-import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.repositories.IDishRepository;
-import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.repositories.IRestaurantRepository;
 import com.pragma.powerup.smallsquearemicroservice.configuration.interceptor.JwtInterceptor;
 import com.pragma.powerup.smallsquearemicroservice.domain.exceptions.UserDontHaveThisRestaurantException;
 import com.pragma.powerup.smallsquearemicroservice.domain.model.Category;
 import com.pragma.powerup.smallsquearemicroservice.domain.model.Dish;
 import com.pragma.powerup.smallsquearemicroservice.domain.model.Restaurant;
 import com.pragma.powerup.smallsquearemicroservice.domain.spi.IDishPersistencePort;
+import com.pragma.powerup.smallsquearemicroservice.domain.spi.IRestaurantPersistencePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class DishUseCaseTest {
     private IDishPersistencePort dishPersistencePort;
-    private IRestaurantRepository restaurantRepository;
-    private IDishRepository dishRepository;
+    private IRestaurantPersistencePort restaurantPersistencePort;
     private DishUseCase dishUseCase;
 
     @BeforeEach
     void setUp() {
         dishPersistencePort = mock(IDishPersistencePort.class);
-        restaurantRepository = mock(IRestaurantRepository.class);
-        dishRepository = mock(IDishRepository.class);
-        dishUseCase = new DishUseCase(dishPersistencePort, restaurantRepository, dishRepository);
+        restaurantPersistencePort = mock(IRestaurantPersistencePort.class);
+        dishUseCase = new DishUseCase(dishPersistencePort, restaurantPersistencePort);
     }
 
     @Test
@@ -41,16 +34,16 @@ class DishUseCaseTest {
         // Arrange
         Dish dish = new Dish(1L, "Name", new Category(), "Description", "15000",
                 new Restaurant(1L, "Name", "Address", "56165", "urlLogo.jpg", 2L, "1235156"), "url", true);
-        RestaurantEntity restaurantEntity = new RestaurantEntity(1L, "Name", "Address", "56165", "urlLogo.jpg", 2L, "1235156");
+        Restaurant restaurant = new Restaurant(1L, "Name", "Address", "56165", "urlLogo.jpg", 2L, "1235156");
         JwtInterceptor.setUserId(2L);
-        restaurantEntity.setIdOwner(JwtInterceptor.getUserId());
-        when(restaurantRepository.findById(dish.getRestaurant().getId())).thenReturn(Optional.of(restaurantEntity));
+        restaurant.setIdOwner(JwtInterceptor.getUserId());
+        when(restaurantPersistencePort.findById(dish.getRestaurant().getId())).thenReturn(restaurant);
 
         // Act
         dishUseCase.saveDish(dish);
 
         // Assert
-        verify(restaurantRepository,atLeastOnce()).findById(dish.getRestaurant().getId());
+        verify(restaurantPersistencePort,atLeastOnce()).findById(dish.getRestaurant().getId());
         verify(dishPersistencePort).saveDish(dish);
     }
 
@@ -61,10 +54,10 @@ class DishUseCaseTest {
         Dish dish = new Dish(1L, "Name", new Category(), "Description", "15000",
                 new Restaurant(1L,"Name","Address","56165","urlLogo.jpg",8L,
                         "1235156"), "url", true);
-        RestaurantEntity restaurantEntity = new RestaurantEntity();
+        Restaurant restaurant = new Restaurant();
         JwtInterceptor.setUserId(2L);
-        restaurantEntity.setIdOwner(JwtInterceptor.getUserId() + 1);
-        when(restaurantRepository.findById(dish.getRestaurant().getId())).thenReturn(Optional.of(restaurantEntity));
+        restaurant.setIdOwner(JwtInterceptor.getUserId() + 1);
+        when(restaurantPersistencePort.findById(dish.getRestaurant().getId())).thenReturn(restaurant);
 
         // Act & Assert
         assertThrows(UserDontHaveThisRestaurantException.class, () -> dishUseCase.saveDish(dish));
@@ -77,7 +70,7 @@ class DishUseCaseTest {
         Dish dish = new Dish(1L, "Name", new Category(), "Description", "15000",
                 new Restaurant(1L,"Name","Address","56165","urlLogo.jpg",8L,
                         "1235156"), "url", true);
-        when(restaurantRepository.findById(dish.getRestaurant().getId())).thenReturn(Optional.empty());
+        when(restaurantPersistencePort.findById(dish.getRestaurant().getId())).thenReturn(null);
 
         // Act & Assert
         assertThrows(RestaurantNotFoundException.class, () -> dishUseCase.saveDish(dish));
@@ -88,22 +81,41 @@ class DishUseCaseTest {
     void updateDish_WhenExistingDishWithValidOwner_ShouldUpdateDishInRepository() {
         // Arrange
         Long dishId = 1L;
-        Dish updatedDish = new Dish(dishId, "Updated Name", new Category(), "Updated Description", "20000",
+        Dish existingDish = new Dish(dishId, "Existing Dish", new Category(), "Existing Description", "15000",
                 new Restaurant(1L, "Name", "Address", "56165", "urlLogo.jpg", 8L, "1235156"), "url", true);
-        DishEntity dishEntity = new DishEntity(dishId, "Name", new CategoryEntity(), "Description", "15000",
-                new RestaurantEntity(1L, "Name", "Address", "56165", "urlLogo.jpg", 8L, "1235156"), "url", true);
-        Optional<DishEntity> dishEntityOptional = Optional.of(dishEntity);
+        Dish updatedDish = new Dish(dishId, "Updated Dish", new Category(), "Updated Description", "20000",
+                existingDish.getRestaurant(), "updated-url", true);
         JwtInterceptor.setUserId(8L);
-        dishEntity.getRestaurantEntity().setIdOwner(JwtInterceptor.getUserId());
-        when(dishRepository.findById(dishId)).thenReturn(dishEntityOptional);
-        when(restaurantRepository.findById(updatedDish.getRestaurant().getId())).thenReturn(Optional.of(dishEntity.getRestaurantEntity()));
+        when(dishPersistencePort.findById(dishId)).thenReturn(existingDish);
+        when(restaurantPersistencePort.findById(existingDish.getRestaurant().getId())).thenReturn(existingDish.getRestaurant());
 
         // Act
         dishUseCase.updateDish(dishId, updatedDish);
 
         // Assert
-        verify(dishRepository).findById(dishId);
-        verify(restaurantRepository, atLeastOnce()).findById(updatedDish.getRestaurant().getId());
+        verify(dishPersistencePort).findById(dishId);
+        verify(restaurantPersistencePort).findById(existingDish.getRestaurant().getId());
         verify(dishPersistencePort).updateDish(dishId, updatedDish);
+    }
+
+    @Test
+    @DisplayName("Given an existing Dish with a valid owner, when changeStateDish is called, then it should change the dish's state in the repository")
+    void changeStateDish_WhenExistingDishWithValidOwner_ShouldChangeDishStateInRepository() {
+        // Arrange
+        Long dishId = 1L;
+        Dish existingDish = new Dish(dishId, "Existing Dish", new Category(), "Existing Description", "15000",
+                new Restaurant(1L, "Name", "Address", "56165", "urlLogo.jpg", 8L, "1235156"), "url", true);
+        JwtInterceptor.setUserId(8L);
+        when(dishPersistencePort.findById(dishId)).thenReturn(existingDish);
+        when(restaurantPersistencePort.findById(existingDish.getRestaurant().getId())).thenReturn(existingDish.getRestaurant());
+
+        // Act
+        dishUseCase.changeStateDish(dishId);
+
+        // Assert
+        verify(dishPersistencePort).findById(dishId);
+        verify(restaurantPersistencePort).findById(existingDish.getRestaurant().getId());
+        verify(dishPersistencePort).changeStateDish(dishId, existingDish);
+        assertFalse(existingDish.getActive());
     }
 }
