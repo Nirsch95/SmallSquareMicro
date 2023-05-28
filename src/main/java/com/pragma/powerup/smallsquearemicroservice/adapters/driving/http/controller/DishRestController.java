@@ -47,9 +47,23 @@ public class DishRestController {
                     @ApiResponse(responseCode = "404", description = "Dish not found",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error"))),
             })
-    @PatchMapping("/{id}")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<Map<String, String>> updateDish(@PathVariable Long id, @Schema(implementation = DishUpdateRequestDto.class) @RequestBody DishRequestDto dishRequestDto) {
         dishHandler.updateDish(id, dishRequestDto);
+        return ResponseEntity.ok()
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_UPDATED_MESSAGE));
+    }
+
+    @Operation(summary = "Update a dish",
+              responses = {
+        @ApiResponse(responseCode = "200", description = "Dish Updated",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = DishUpdateRequestDto.class))),
+        @ApiResponse(responseCode = "404", description = "Dish not found",
+                content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error"))),
+    })
+    @PatchMapping("/state/{id}")
+    public ResponseEntity<Map<String, String>> changeStateDish(@PathVariable Long id) {
+        dishHandler.changeStateDish(id);
         return ResponseEntity.ok()
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_UPDATED_MESSAGE));
     }
