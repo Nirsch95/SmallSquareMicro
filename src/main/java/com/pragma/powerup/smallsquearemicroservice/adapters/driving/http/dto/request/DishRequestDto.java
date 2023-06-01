@@ -15,7 +15,9 @@ public class DishRequestDto {
     @NotEmpty(message = Constants.EMPTY_FIELD_MESSAGE)
     private String description;
     @NotNull(message = Constants.EMPTY_FIELD_MESSAGE)
+    @Positive
     @Min(value = 1, message = "")
+    @Max(value = Integer.MAX_VALUE, message = "")
     private Integer price;
     @NotNull(message = Constants.EMPTY_FIELD_MESSAGE)
     private Long idRestaurant;

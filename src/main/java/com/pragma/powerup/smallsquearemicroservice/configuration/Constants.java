@@ -40,5 +40,7 @@ public class Constants {
     public static final String INVALID_FORMAT_NAME_MESSAGE = "Invalid format name";
     public static final String INVALID_USER_TO_CREATE_UPDATE_DISH = "This user is not the owner of this restaurant";
     public static final String INVALID_TOKEN_MESSAGE = "Invalid token";
+    public static final String INVALID_PAGE_MESSAGE = "Invalid page";
+    public static final String INVALID_FORMAT_EMAIL_MESSAGE = "Invalid format email";
     public static final String UNALLOWED_USER_TO_USE_ENDPOINT = "This user is not allowed to use this endpoint";
 }

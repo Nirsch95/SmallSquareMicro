@@ -61,7 +61,7 @@ public class DishMysqlAdapter implements IDishPersistencePort {
                     category.getDescription()), entity.getDescription(), entity.getPrice(),
                     new Restaurant(restaurant.getId(), restaurant.getName(), restaurant.getAddress(),
                             restaurant.getPhone(), restaurant.getUrlLogo(), restaurant.getIdOwner(),
-                            restaurant.getDniNumber()), entity.getUrlImagen(), entity.getActive());
+                            restaurant.getDniNumber(), restaurant.getEmployees()), entity.getUrlImagen(), entity.getActive());
         }
     throw new DishNotFoundException();
     }

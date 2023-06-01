@@ -1,5 +1,7 @@
 package com.pragma.powerup.smallsquearemicroservice.domain.model;
 
+import java.util.Set;
+
 public class Restaurant {
     private Long id;
     private String name;
@@ -8,11 +10,12 @@ public class Restaurant {
     private String urlLogo;
     private Long idOwner;
     private String dniNumber;
+    private Set<Long> employeesIds;
 
     public Restaurant() {
     }
 
-    public Restaurant(Long id, String name, String address, String phone, String urlLogo, Long idOwner, String dniNumber) {
+    public Restaurant(Long id, String name, String address, String phone, String urlLogo, Long idOwner, String dniNumber, Set<Long> employeesIds) {
         this.id = id;
         this.name = name;
         this.address = address;
@@ -20,6 +23,7 @@ public class Restaurant {
         this.urlLogo = urlLogo;
         this.idOwner = idOwner;
         this.dniNumber = dniNumber;
+        this.employeesIds = employeesIds;
     }
 
     public Long getId() {
@@ -76,5 +80,13 @@ public class Restaurant {
 
     public void setDniNumber(String dniNumber) {
         this.dniNumber = dniNumber;
+    }
+
+    public Set<Long> getEmployeesIds() {
+        return employeesIds;
+    }
+
+    public void setEmployeesIds(Set<Long> employeesIds) {
+        this.employeesIds = employeesIds;
     }
 }

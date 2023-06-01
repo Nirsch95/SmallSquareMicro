@@ -5,6 +5,7 @@ import com.pragma.powerup.smallsquearemicroservice.configuration.interceptor.exc
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Setter;
@@ -21,17 +22,9 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     private static final String TOKEN_PREFIX = "Bearer ";
     @Setter
-    private static String authorizationToken;
+    private String authorizationToken;
     @Setter
-    private static Long userId;
-
-    public static String getAuthorizationToken() {
-        return authorizationToken;
-    }
-
-    public static Long getUserId() {
-        return userId;
-    }
+    private Long userId;
 
     @Value("${jwt.secret}")
     private String secret;
@@ -41,6 +34,26 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Value("${my.variables.owner}")
     private String owner;
+
+    @Value("${my.variables.client}")
+    private String client;
+
+    private final Map<String, String> endpointRoles = new HashMap<>();
+    @PostConstruct
+    private void initializeEndpointRoles() {
+        endpointRoles.put("/dish", owner);
+        endpointRoles.put("/restaurant/add", owner);
+        endpointRoles.put("/restaurant", admin);
+        endpointRoles.put("/restaurant/all/", client);
+    }
+
+    public String getAuthorizationToken() {
+        return authorizationToken;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
@@ -52,7 +65,10 @@ public class JwtInterceptor implements HandlerInterceptor {
         if (owner.equals(userRole) && isAllowedEndpoint(request.getRequestURI(), userRole)) {
             return true;
         }
-        // Si el usuario no tiene acceso, puedes enviar una respuesta de error o redirigirlo a otra página
+
+        if (client.equals(userRole) && isAllowedEndpoint(request.getRequestURI(), userRole)) {
+            return true;
+        }
         throw new UserIsNotAllowedException();
     }
 
@@ -67,7 +83,6 @@ public class JwtInterceptor implements HandlerInterceptor {
             Claims claims = Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(authorizationToken).getBody();
             List<String> roles = claims.get("roles", List.class);
             userId = claims.get("id", Long.class);
-            // Additional role-based checks or processing can be performed here
             return roles.get(0);
         } catch (JwtException e) {
             throw new InvalidTokenException();
@@ -75,16 +90,13 @@ public class JwtInterceptor implements HandlerInterceptor {
     }
 
     private boolean isAllowedEndpoint(String requestURI, String role) {
-        Map<String, String> endpointRoles = new HashMap<>();
-        endpointRoles.put("/dish", owner);
-        endpointRoles.put("/restaurant", admin);
-
-        for(String endpoint : endpointRoles.keySet()) {
-            if(requestURI.startsWith(endpoint)) {
-                String allowedRole = endpointRoles.get(endpoint);
-                return allowedRole.equals(role);
-            }
+        if (endpointRoles.containsKey(requestURI)) {
+            String allowedRole = endpointRoles.get(requestURI);
+            return allowedRole.equals(role);
         }
-        return false;
+        if(requestURI.startsWith("/restaurant/all/") && client.equals(role)){
+            return true;
+        }
+        return requestURI.startsWith("/restaurant/add/") && owner.equals(role);
     }
 }
