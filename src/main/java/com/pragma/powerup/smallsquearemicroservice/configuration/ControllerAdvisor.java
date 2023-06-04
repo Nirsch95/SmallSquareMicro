@@ -120,4 +120,11 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INVALID_TOKEN_MESSAGE));
     }
+
+    @ExceptionHandler(InvalidPageException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidPageException(
+            InvalidPageException invalidPageException) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INVALID_PAGE_MESSAGE));
+    }
 }

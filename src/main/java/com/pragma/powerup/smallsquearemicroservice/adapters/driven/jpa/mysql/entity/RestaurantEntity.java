@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "restaurant")
 @NoArgsConstructor
@@ -23,4 +25,5 @@ public class RestaurantEntity {
     private Long idOwner;
     @Column(unique = true, nullable = false, length = 20)
     private String dniNumber;
+    private Set<Long> employees;
 }

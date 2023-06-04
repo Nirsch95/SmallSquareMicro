@@ -12,11 +12,13 @@ import com.pragma.powerup.smallsquearemicroservice.domain.spi.IRestaurantPersist
 public class DishUseCase implements IDishServicePort {
     private final IDishPersistencePort dishPersistencePort;
     private final IRestaurantPersistencePort restaurantPersistencePort;
+    private final JwtInterceptor jwtInterceptor;
 
 
-    public DishUseCase(IDishPersistencePort dishPersistencePort, IRestaurantPersistencePort restaurantPersistencePort) {
+    public DishUseCase(IDishPersistencePort dishPersistencePort, IRestaurantPersistencePort restaurantPersistencePort, JwtInterceptor jwtInterceptor) {
         this.dishPersistencePort = dishPersistencePort;
         this.restaurantPersistencePort = restaurantPersistencePort;
+        this.jwtInterceptor = jwtInterceptor;
     }
 
     @Override
@@ -46,7 +48,7 @@ public class DishUseCase implements IDishServicePort {
         if(restaurant == null) {
             throw new RestaurantNotFoundException();
         }
-        Long userId = JwtInterceptor.getUserId();
+        Long userId = jwtInterceptor.getUserId();
         if (!restaurant.getIdOwner().equals(userId)) {
             throw new UserDontHaveThisRestaurantException();
         }

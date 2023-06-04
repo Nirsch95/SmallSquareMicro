@@ -1,7 +1,6 @@
 package com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.mapper;
 
-import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.response.RestaurantResponseDto;
-import com.pragma.powerup.smallsquearemicroservice.domain.model.Restaurant;
+import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.response.RestaurantSummaryDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -11,5 +10,5 @@ import java.util.List;
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface IRestaurantResponseMapper {
-    List<RestaurantResponseDto> toResponseList(List<Restaurant> restaurantList);
+    List<RestaurantSummaryDto> toResponseList(List<RestaurantSummaryDto> restaurantList);
 }

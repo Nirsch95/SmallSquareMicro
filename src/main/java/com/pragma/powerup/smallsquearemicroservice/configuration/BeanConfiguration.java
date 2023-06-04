@@ -9,6 +9,7 @@ import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.map
 import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.repositories.ICategoryRepository;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.repositories.IDishRepository;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.repositories.IRestaurantRepository;
+import com.pragma.powerup.smallsquearemicroservice.configuration.interceptor.JwtInterceptor;
 import com.pragma.powerup.smallsquearemicroservice.domain.api.ICategoryServicePort;
 import com.pragma.powerup.smallsquearemicroservice.domain.api.IDishServicePort;
 import com.pragma.powerup.smallsquearemicroservice.domain.api.IRestaurantServicePort;
@@ -33,6 +34,7 @@ public class BeanConfiguration {
     private final IDishEntityMapper dishEntityMapper;
     private final ICategoryRepository categoryRepository;
     private final ICategoryEntityMapper categoryEntityMapper;
+    private final JwtInterceptor jwtInterceptor;
     @Bean
     public IRestaurantServicePort restaurantServicePort() {
         return new RestaurantUseCase(restaurantPersistencePort());
@@ -45,7 +47,7 @@ public class BeanConfiguration {
 
     @Bean
     public IDishServicePort dishServicePort(){
-        return new DishUseCase(dishPersistencePort(), restaurantPersistencePort());
+        return new DishUseCase(dishPersistencePort(), restaurantPersistencePort(), jwtInterceptor);
     }
 
     @Bean
