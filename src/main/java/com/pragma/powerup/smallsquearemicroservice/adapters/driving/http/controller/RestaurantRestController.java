@@ -1,7 +1,7 @@
 package com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.controller;
 
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.request.RestaurantRequestDto;
-import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.request.UserDto;
+import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.request.UserRequestDto;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.response.RestaurantSummaryDto;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.handlers.IRestaurantHandler;
 import com.pragma.powerup.smallsquearemicroservice.configuration.Constants;
@@ -62,9 +62,9 @@ public class RestaurantRestController {
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error"))),
             })
     @PostMapping("/add/{restaurantId}")
-    public ResponseEntity<Map<String, String>> addEmployee(@PathVariable Long restaurantId, @RequestBody UserDto userDto){
+    public ResponseEntity<Map<String, String>> addEmployee(@PathVariable Long restaurantId, @RequestBody UserRequestDto userDto){
         restaurantHandler.addEmployee(restaurantId, userDto);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.RESTAURANT_CREATED_MESSAGE));
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.EMPLOYEE_ADDED_TO_RESTAURANT));
     }
 }

@@ -1,7 +1,7 @@
 package com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.handlers.impl;
 
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.request.RestaurantRequestDto;
-import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.request.UserDto;
+import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.request.UserRequestDto;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.response.RestaurantSummaryDto;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.handlers.IRestaurantHandler;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.mapper.IRestaurantRequestMapper;
@@ -31,7 +31,7 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
     }
 
     @Override
-    public void addEmployee(Long restaurantId, UserDto userDto) {
+    public void addEmployee(Long restaurantId, UserRequestDto userDto) {
         restaurantServicePort.addEmployee(restaurantId, userDto);
     }
 }

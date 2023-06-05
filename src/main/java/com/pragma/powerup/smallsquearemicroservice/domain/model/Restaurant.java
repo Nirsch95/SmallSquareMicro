@@ -1,5 +1,6 @@
 package com.pragma.powerup.smallsquearemicroservice.domain.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Restaurant {
@@ -10,12 +11,13 @@ public class Restaurant {
     private String urlLogo;
     private Long idOwner;
     private String dniNumber;
-    private Set<Long> employeesIds;
+    private Set<Long> employees;
 
     public Restaurant() {
+        employees = new HashSet<>();
     }
 
-    public Restaurant(Long id, String name, String address, String phone, String urlLogo, Long idOwner, String dniNumber, Set<Long> employeesIds) {
+    public Restaurant(Long id, String name, String address, String phone, String urlLogo, Long idOwner, String dniNumber, Set<Long> employees) {
         this.id = id;
         this.name = name;
         this.address = address;
@@ -23,7 +25,7 @@ public class Restaurant {
         this.urlLogo = urlLogo;
         this.idOwner = idOwner;
         this.dniNumber = dniNumber;
-        this.employeesIds = employeesIds;
+        this.employees = employees;
     }
 
     public Long getId() {
@@ -82,11 +84,15 @@ public class Restaurant {
         this.dniNumber = dniNumber;
     }
 
-    public Set<Long> getEmployeesIds() {
-        return employeesIds;
+    public Set<Long> getEmployees() {
+        return employees;
     }
 
-    public void setEmployeesIds(Set<Long> employeesIds) {
-        this.employeesIds = employeesIds;
+    public void setEmployees(Set<Long> employeesIds) {
+        this.employees = employeesIds;
+    }
+
+    public void addEmployeeId(Long employeeId) {
+        employees.add(employeeId);
     }
 }
