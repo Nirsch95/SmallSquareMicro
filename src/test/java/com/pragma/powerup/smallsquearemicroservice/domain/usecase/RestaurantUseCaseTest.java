@@ -1,7 +1,12 @@
 package com.pragma.powerup.smallsquearemicroservice.domain.usecase;
 
+import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.exceptions.RestaurantNotFoundException;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.adapter.RestTemplateAdapter;
+import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.request.UserRequestDto;
+import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.response.RestaurantSummaryDto;
 import com.pragma.powerup.smallsquearemicroservice.configuration.Constants;
+import com.pragma.powerup.smallsquearemicroservice.configuration.interceptor.JwtInterceptor;
+import com.pragma.powerup.smallsquearemicroservice.domain.exceptions.UserDontHaveThisRestaurantException;
 import com.pragma.powerup.smallsquearemicroservice.domain.exceptions.UserNotBeAOwnerException;
 import com.pragma.powerup.smallsquearemicroservice.domain.model.Restaurant;
 import com.pragma.powerup.smallsquearemicroservice.domain.model.User;
@@ -14,68 +19,123 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class RestaurantUseCaseTest {
-
     @Mock
     private IRestaurantPersistencePort restaurantPersistencePort;
+
+    @Mock
+    private JwtInterceptor jwtInterceptor;
+
     @Mock
     private RestTemplateAdapter restTemplateAdapter;
+
     @InjectMocks
     private RestaurantUseCase restaurantUseCase;
 
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testSaveRestaurant()  {
-        // Arrange
-        User user = new User(10L,"Lili", "Gallego","lili@gmail.com","288383",
-                new Date(10, 3, 4),"12345","123456", Constants.OWNER_ROLE_ID);
+    void testSaveRestaurant_ValidOwner_SaveRestaurant() {
 
+        User owner = new User(123L, "name", "surname", "12345678", "+12345678",
+                new Date(18, 10, 2), "example@example.com", "mypassword", 2L);
 
-        Restaurant restaurant = new Restaurant(10L,"Las delicias de la 5ta","clle 19 N°19-22",
-                "18181818",
-                "https://jimdo-storage.freetls.fastly.net/image/9939456/d2e94e18-d535-4d67-87ef-e96f4d1b591f.png?quality=80,90&auto=webp&disable=upscale&width=455.23809523809524&height=239&crop=1:0.525",
-                user.getId(), "199191919");
+        when(jwtInterceptor.getUserId()).thenReturn(123L);
+        when(restTemplateAdapter.getUser(owner.getId())).thenReturn(owner);
 
+        Restaurant restaurant = new Restaurant(1L, "name", "address", "phone",
+                "http://", 123L, "ownerPhone", Collections.emptySet());
 
-        when(restTemplateAdapter.getUser(10L)).thenReturn(user);
-        restaurantPersistencePort.saveRestaurant(restaurant);
-        // Act
         restaurantUseCase.saveRestaurant(restaurant);
 
-        // Assert
         verify(restaurantPersistencePort, times(1)).saveRestaurant(restaurant);
     }
 
     @Test
-    void saveRestaurant_invalidRoleUser() {
-        // Arrange
+    void testSaveRestaurant_InvalidOwner_ThrowUserNotBeAOwnerException() {
+
+        User owner = new User(123L, "name", "surname", "12345678", "+12345678",
+                new Date(18, 10, 2), "example@example.com", "mypassword", 3L);
+
+        when(jwtInterceptor.getUserId()).thenReturn(123L);
+        when(restTemplateAdapter.getUser(owner.getId())).thenReturn(owner);
+
+        Restaurant restaurant = new Restaurant(1L, "name", "address", "phone",
+                "http://", 123L, "ownerPhone", Collections.emptySet());
+
+        assertThrows(UserNotBeAOwnerException.class, () -> restaurantUseCase.saveRestaurant(restaurant));
+
+        verify(restaurantPersistencePort, never()).saveRestaurant(restaurant);
+    }
+
+    @Test
+    void testGetRestaurants_ReturnListOfRestaurantSummaryDto() {
+
+        int page = 1;
+        int size = 10;
+        List<RestaurantSummaryDto> expectedList = Collections.singletonList(new RestaurantSummaryDto("name", "urlLogo"));
+
+        when(restaurantPersistencePort.getRestaurants(page, size)).thenReturn(expectedList);
+
+        List<RestaurantSummaryDto> result = restaurantUseCase.getRestaurants(page, size);
+
+        verify(restaurantPersistencePort, times(1)).getRestaurants(page, size);
+
+        assertEquals(expectedList, result);
+    }
+
+    @Test
+    void testAddEmployee_RestaurantNotFound_ThrowRestaurantNotFoundException() {
+        //Arrange
+        Long restaurantId = 1L;
+        UserRequestDto userDto = new UserRequestDto();
+        when(restaurantPersistencePort.findById(restaurantId)).thenReturn(null);
+        //Act & Assert
+        assertThrows(RestaurantNotFoundException.class, () -> restaurantUseCase.addEmployee(restaurantId, userDto));
+        verify(restaurantPersistencePort, never()).addEmployees(any());
+    }
+
+    @Test
+    void testAddEmployee_ValidInput_AddEmployeeToRestaurant() {
+
+        //Arrange
+        Long restaurantId = 1L;
+        UserRequestDto userDto = new UserRequestDto();
+        Restaurant restaurant = new Restaurant(restaurantId, "name", "str 123", "13245678",
+                "http://",123L, "12345678", new HashSet<>());
+        UserRequestDto createdEmployee = new UserRequestDto();
+
+        when(jwtInterceptor.getUserId()).thenReturn(123L);
+        when(restaurantPersistencePort.findById(restaurantId)).thenReturn(restaurant);
+        when(restTemplateAdapter.getUserByDni(userDto.getDniNumber())).thenReturn(createdEmployee);
+
+        //Act
+        restaurantUseCase.addEmployee(restaurantId, userDto);
+
+        //Assert
+        verify(restaurantPersistencePort, times(1)).addEmployees(restaurant);
+        verify(restTemplateAdapter, times(1)).createEmployee(userDto);
+    }
+
+    @Test
+    void testValidateIdOwner_InvalidOwner_ThrowUserDontHaveThisRestaurantException() {
+
         Restaurant restaurant = new Restaurant();
         restaurant.setIdOwner(123L);
 
-        User user = new User();
-        user.setIdRole(456L);
+        when(jwtInterceptor.getUserId()).thenReturn(456L);
 
-        when(restTemplateAdapter.getUser(123L)).thenReturn(user);
-
-        try {
-            // Act
-            restaurantUseCase.saveRestaurant(restaurant);
-            fail("Expected UserNotBeAOwnerException to be thrown");
-        } catch (UserNotBeAOwnerException ex) {
-            // Assert
-            assertEquals("UserNotBeAOwnerException", ex.getClass().getSimpleName());
-        }
-
-        verify(restaurantPersistencePort, never()).saveRestaurant(any(Restaurant.class));
+        assertThrows(UserDontHaveThisRestaurantException.class, () -> restaurantUseCase.validateIdOwner(restaurant));
     }
 }
