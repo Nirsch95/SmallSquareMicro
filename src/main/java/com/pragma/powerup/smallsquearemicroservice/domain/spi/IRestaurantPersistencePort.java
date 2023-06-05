@@ -9,4 +9,5 @@ public interface IRestaurantPersistencePort {
     void saveRestaurant(Restaurant restaurant);
     Restaurant findById(Long id);
     List<RestaurantSummaryDto> getRestaurants(int page, int size);
+    void addEmployees(Restaurant restaurant);
 }

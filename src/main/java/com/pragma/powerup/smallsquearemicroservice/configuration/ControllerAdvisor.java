@@ -1,6 +1,9 @@
 package com.pragma.powerup.smallsquearemicroservice.configuration;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.exceptions.*;
+import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.exceptions.ForbiddenCustomException;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.exceptions.UserNotFoundException;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.exceptions.UserNotFoundMicroserviceDownException;
 import com.pragma.powerup.smallsquearemicroservice.configuration.interceptor.exception.InvalidTokenException;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -126,5 +130,21 @@ public class ControllerAdvisor {
             InvalidPageException invalidPageException) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INVALID_PAGE_MESSAGE));
+    }
+
+    @ExceptionHandler(ForbiddenCustomException.class)
+    public ResponseEntity<Map<String, String>> handleForbiddenCustomException(
+            ForbiddenCustomException forbiddenCustomException) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String errorBody = forbiddenCustomException.getMessage();
+        try {
+            Map<String, String> errorMap = objectMapper.readValue(errorBody, new TypeReference<Map<String, String>>() {});
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMap);
+        } catch (IOException e) {
+            // Manejar la excepción de deserialización si ocurre algún error
+            e.printStackTrace();
+            // Devolver un mensaje genérico en caso de que no se pueda deserializar el cuerpo de la respuesta
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, "Error de formato de respuesta"));
+        }
     }
 }

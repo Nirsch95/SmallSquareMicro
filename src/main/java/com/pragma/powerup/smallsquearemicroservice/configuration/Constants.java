@@ -43,4 +43,5 @@ public class Constants {
     public static final String INVALID_PAGE_MESSAGE = "Invalid page";
     public static final String INVALID_FORMAT_EMAIL_MESSAGE = "Invalid format email";
     public static final String UNALLOWED_USER_TO_USE_ENDPOINT = "This user is not allowed to use this endpoint";
+    public static final String EMPLOYEE_ADDED_TO_RESTAURANT = "The employee has been added to restaurant";
 }

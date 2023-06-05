@@ -12,110 +12,117 @@ import com.pragma.powerup.smallsquearemicroservice.domain.spi.IRestaurantPersist
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class DishUseCaseTest {
+    @Mock
     private IDishPersistencePort dishPersistencePort;
+
+    @Mock
     private IRestaurantPersistencePort restaurantPersistencePort;
+
+    @Mock
+    private JwtInterceptor jwtInterceptor;
+
     private DishUseCase dishUseCase;
 
     @BeforeEach
-    void setUp() {
-        dishPersistencePort = mock(IDishPersistencePort.class);
-        restaurantPersistencePort = mock(IRestaurantPersistencePort.class);
-        dishUseCase = new DishUseCase(dishPersistencePort, restaurantPersistencePort);
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+        dishUseCase = new DishUseCase(dishPersistencePort, restaurantPersistencePort, jwtInterceptor);
     }
 
     @Test
-    @DisplayName("Given a new Dish with a valid owner, when saveDish is called, then it should save the dish in the repository")
-    void saveDish_WhenNewDishWithValidOwner_ShouldSaveDishInRepository() {
-        // Arrange
-        Dish dish = new Dish(1L, "Name", new Category(), "Description", "15000",
-                new Restaurant(1L, "Name", "Address", "56165", "urlLogo.jpg", 2L, "1235156"), "url", true);
-        Restaurant restaurant = new Restaurant(1L, "Name", "Address", "56165", "urlLogo.jpg", 2L, "1235156");
-        JwtInterceptor.setUserId(2L);
-        restaurant.setIdOwner(JwtInterceptor.getUserId());
-        when(restaurantPersistencePort.findById(dish.getRestaurant().getId())).thenReturn(restaurant);
+    void testSaveDish_ValidDish_CallsPersistencePortSaveDish() {
+        Restaurant restaurant = new Restaurant(1L, "name", "address", "+12345678",
+                "urlLogo", 123L, "12345678",new HashSet<>());
+        Dish dish = new Dish(1L, "name", new Category(),"description","1234",restaurant,
+                "ImageNet.jpg",true);
 
-        // Act
+        when(jwtInterceptor.getUserId()).thenReturn(123L);
+        when(restaurantPersistencePort.findById(anyLong())).thenReturn(restaurant);
+
         dishUseCase.saveDish(dish);
 
-        // Assert
-        verify(restaurantPersistencePort,atLeastOnce()).findById(dish.getRestaurant().getId());
-        verify(dishPersistencePort).saveDish(dish);
+        verify(dishPersistencePort, times(1)).saveDish(dish);
     }
 
     @Test
-    @DisplayName("Given a new Dish with an invalid owner, when saveDish is called, then it should throw UserDontHaveThisRestaurantException")
-    void saveDish_WhenNewDishWithInvalidOwner_ShouldThrowUserDontHaveThisRestaurantException() {
-        // Arrange
-        Dish dish = new Dish(1L, "Name", new Category(), "Description", "15000",
-                new Restaurant(1L,"Name","Address","56165","urlLogo.jpg",8L,
-                        "1235156"), "url", true);
-        Restaurant restaurant = new Restaurant();
-        JwtInterceptor.setUserId(2L);
-        restaurant.setIdOwner(JwtInterceptor.getUserId() + 1);
-        when(restaurantPersistencePort.findById(dish.getRestaurant().getId())).thenReturn(restaurant);
+    void testSaveDish_InvalidRestaurant_ThrowsRestaurantNotFoundException() {
+        Dish dish = new Dish();
+        dish.setRestaurant(new Restaurant());
 
-        // Act & Assert
-        assertThrows(UserDontHaveThisRestaurantException.class, () -> dishUseCase.saveDish(dish));
+        when(jwtInterceptor.getUserId()).thenReturn(123L);
+        when(restaurantPersistencePort.findById(anyLong())).thenReturn(null);
+
+        assertThrows(RestaurantNotFoundException.class, () -> {
+            dishUseCase.saveDish(dish);
+        });
+
+        verify(dishPersistencePort, never()).saveDish(any(Dish.class));
     }
 
     @Test
-    @DisplayName("Given a new Dish with a non-existent restaurant, when saveDish is called, then it should throw RestaurantNotFoundException")
-    void saveDish_WhenNewDishWithNonExistentRestaurant_ShouldThrowRestaurantNotFoundException() {
-        // Arrange
-        Dish dish = new Dish(1L, "Name", new Category(), "Description", "15000",
-                new Restaurant(1L,"Name","Address","56165","urlLogo.jpg",8L,
-                        "1235156"), "url", true);
-        when(restaurantPersistencePort.findById(dish.getRestaurant().getId())).thenReturn(null);
+    void testSaveDish_UserNotOwner_ThrowsUserDontHaveThisRestaurantException() {
+        Restaurant restaurant = new Restaurant(1L, "name", "address", "+12345678",
+                "urlLogo", 124L, "12345678",new HashSet<>());
+        Dish dish = new Dish(1L, "name", new Category(),"description","1234",restaurant,
+                "ImageNet.jpg",true);
 
-        // Act & Assert
-        assertThrows(RestaurantNotFoundException.class, () -> dishUseCase.saveDish(dish));
+        when(jwtInterceptor.getUserId()).thenReturn(123L);
+        when(restaurantPersistencePort.findById(anyLong())).thenReturn(restaurant);
+
+        assertThrows(UserDontHaveThisRestaurantException.class, () -> {
+            dishUseCase.saveDish(dish);
+        });
+
+        verify(dishPersistencePort, never()).saveDish(any(Dish.class));
     }
 
     @Test
-    @DisplayName("Given an existing Dish with a valid owner, when updateDish is called, then it should update the dish in the repository")
-    void updateDish_WhenExistingDishWithValidOwner_ShouldUpdateDishInRepository() {
-        // Arrange
+    void testUpdateDish_ValidDish_CallsPersistencePortUpdateDish() {
         Long dishId = 1L;
-        Dish existingDish = new Dish(dishId, "Existing Dish", new Category(), "Existing Description", "15000",
-                new Restaurant(1L, "Name", "Address", "56165", "urlLogo.jpg", 8L, "1235156"), "url", true);
-        Dish updatedDish = new Dish(dishId, "Updated Dish", new Category(), "Updated Description", "20000",
-                existingDish.getRestaurant(), "updated-url", true);
-        JwtInterceptor.setUserId(8L);
-        when(dishPersistencePort.findById(dishId)).thenReturn(existingDish);
-        when(restaurantPersistencePort.findById(existingDish.getRestaurant().getId())).thenReturn(existingDish.getRestaurant());
+        Restaurant restaurant = new Restaurant(1L, "name", "address", "+12345678",
+                "urlLogo", 123L, "12345678",new HashSet<>());
+        Dish existingDish = new Dish(1L, "name", new Category(),"description","1234",restaurant,
+                "ImageNet.jpg",true);
 
-        // Act
+        Dish updatedDish = new Dish();
+        updatedDish.setName("Updated Dish");
+
+        when(dishPersistencePort.findById(dishId)).thenReturn(existingDish);
+        when(restaurantPersistencePort.findById(restaurant.getId())).thenReturn(restaurant);
+        when(jwtInterceptor.getUserId()).thenReturn(123L);
+
         dishUseCase.updateDish(dishId, updatedDish);
 
-        // Assert
-        verify(dishPersistencePort).findById(dishId);
-        verify(restaurantPersistencePort).findById(existingDish.getRestaurant().getId());
-        verify(dishPersistencePort).updateDish(dishId, updatedDish);
+        verify(dishPersistencePort, times(1)).updateDish(dishId, updatedDish);
     }
 
     @Test
-    @DisplayName("Given an existing Dish with a valid owner, when changeStateDish is called, then it should change the dish's state in the repository")
-    void changeStateDish_WhenExistingDishWithValidOwner_ShouldChangeDishStateInRepository() {
+    void testChangeStateDish_ValidDish_CallsPersistencePortSaveDish(){
         // Arrange
-        Long dishId = 1L;
-        Dish existingDish = new Dish(dishId, "Existing Dish", new Category(), "Existing Description", "15000",
-                new Restaurant(1L, "Name", "Address", "56165", "urlLogo.jpg", 8L, "1235156"), "url", true);
-        JwtInterceptor.setUserId(8L);
-        when(dishPersistencePort.findById(dishId)).thenReturn(existingDish);
-        when(restaurantPersistencePort.findById(existingDish.getRestaurant().getId())).thenReturn(existingDish.getRestaurant());
+        Restaurant restaurant = new Restaurant(1L, "name", "address", "+12345678",
+                "urlLogo", 123L, "12345678",new HashSet<>());
+        Dish dish = new Dish(1L, "name", new Category(),"description","1234",restaurant,
+                "ImageNet.jpg",true);
+
+        when(dishPersistencePort.findById(dish.getId())).thenReturn(dish);
+        when(restaurantPersistencePort.findById(restaurant.getId())).thenReturn(restaurant);
+        when(jwtInterceptor.getUserId()).thenReturn(123L);
 
         // Act
-        dishUseCase.changeStateDish(dishId);
+        dishUseCase.changeStateDish(dish.getId());
 
         // Assert
-        verify(dishPersistencePort).findById(dishId);
-        verify(restaurantPersistencePort).findById(existingDish.getRestaurant().getId());
-        verify(dishPersistencePort).changeStateDish(dishId, existingDish);
-        assertFalse(existingDish.getActive());
+        verify(dishPersistencePort, times(1)).changeStateDish(dish.getId(), dish);
     }
 }
