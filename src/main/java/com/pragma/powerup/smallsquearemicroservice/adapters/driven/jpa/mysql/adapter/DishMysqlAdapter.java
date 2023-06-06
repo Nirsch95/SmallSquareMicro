@@ -5,6 +5,7 @@ import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.ent
 import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.entity.RestaurantEntity;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.exceptions.DishAlreadyExistsException;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.exceptions.DishNotFoundException;
+import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.exceptions.NoDataFoundException;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.mappers.IDishEntityMapper;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.repositories.IDishRepository;
 import com.pragma.powerup.smallsquearemicroservice.domain.model.Category;
@@ -78,7 +79,10 @@ public class DishMysqlAdapter implements IDishPersistencePort {
             dishPage = dishRepository.findAllByRestaurantEntityId(idRestaurant, pageRequest);
             return dishEntityMapper.toDishList(dishPage.getContent());
         }
-        dishPage = dishRepository.findAllByRestaurantEntityIdAndCategoryEntityId(idRestaurant, category, pageRequest);
-        return dishEntityMapper.toDishList(dishPage.getContent());
+        if(category > 0L){
+            dishPage = dishRepository.findAllByRestaurantEntityIdAndCategoryEntityId(idRestaurant, category, pageRequest);
+            return dishEntityMapper.toDishList(dishPage.getContent());
+        }
+        throw new NoDataFoundException();
     }
 }
