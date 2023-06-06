@@ -42,6 +42,7 @@ public class JwtInterceptor implements HandlerInterceptor {
     @PostConstruct
     private void initializeEndpointRoles() {
         endpointRoles.put("/dish", owner);
+        endpointRoles.put("/dish/all/", client);
         endpointRoles.put("/restaurant/add", owner);
         endpointRoles.put("/restaurant", admin);
         endpointRoles.put("/restaurant/all/", client);
@@ -95,6 +96,9 @@ public class JwtInterceptor implements HandlerInterceptor {
             return allowedRole.equals(role);
         }
         if(requestURI.startsWith("/restaurant/all/") && client.equals(role)){
+            return true;
+        }
+        if(requestURI.startsWith("/dish/all/") && client.equals(role)){
             return true;
         }
         return requestURI.startsWith("/restaurant/add/") && owner.equals(role);

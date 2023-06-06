@@ -9,6 +9,8 @@ import com.pragma.powerup.smallsquearemicroservice.domain.model.Restaurant;
 import com.pragma.powerup.smallsquearemicroservice.domain.spi.IDishPersistencePort;
 import com.pragma.powerup.smallsquearemicroservice.domain.spi.IRestaurantPersistencePort;
 
+import java.util.List;
+
 public class DishUseCase implements IDishServicePort {
     private final IDishPersistencePort dishPersistencePort;
     private final IRestaurantPersistencePort restaurantPersistencePort;
@@ -41,6 +43,11 @@ public class DishUseCase implements IDishServicePort {
         validateIdOwner(dish.getRestaurant().getId());
         dish.setActive(!dish.getActive());
         dishPersistencePort.changeStateDish(id, dish);
+    }
+
+    @Override
+    public List<Dish> getDishes(Long idRestaurant, int page, int size, Long categoy) {
+        return dishPersistencePort.getDishes(idRestaurant, page, size, categoy);
     }
 
     public void validateIdOwner(Long idRestaurant) {

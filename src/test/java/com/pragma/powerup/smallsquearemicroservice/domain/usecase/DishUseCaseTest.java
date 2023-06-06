@@ -16,7 +16,9 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -124,5 +126,29 @@ class DishUseCaseTest {
 
         // Assert
         verify(dishPersistencePort, times(1)).changeStateDish(dish.getId(), dish);
+    }
+
+    @Test
+    void testGetDishes() {
+        // Arrange
+        Long idRestaurant = 1L;
+        int page = 1;
+        int size = 10;
+        Long category = 2L;
+
+        List<Dish> expectedDishes = new ArrayList<>();
+        expectedDishes.add(new Dish(1L, "Plato 1", new Category(category, "category", "category"),
+                "Description 1", "15000", new Restaurant(), "urlImage", true));
+        expectedDishes.add(new Dish(2L, "Plato 2", new Category(category, "category", "category"),
+                "Description 2", "20000", new Restaurant(), "urlImage", true));
+
+        when(dishPersistencePort.getDishes(idRestaurant, page, size, category)).thenReturn(expectedDishes);
+
+        // Act
+        List<Dish> actualDishes = dishUseCase.getDishes(idRestaurant, page, size, category);
+
+        // Assert
+        assertEquals(expectedDishes, actualDishes);
+        verify(dishPersistencePort, times(1)).getDishes(idRestaurant, page, size, category);
     }
 }
