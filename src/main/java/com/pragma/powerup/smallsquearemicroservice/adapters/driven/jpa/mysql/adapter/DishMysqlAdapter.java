@@ -12,8 +12,12 @@ import com.pragma.powerup.smallsquearemicroservice.domain.model.Dish;
 import com.pragma.powerup.smallsquearemicroservice.domain.model.Restaurant;
 import com.pragma.powerup.smallsquearemicroservice.domain.spi.IDishPersistencePort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -64,5 +68,17 @@ public class DishMysqlAdapter implements IDishPersistencePort {
                             restaurant.getDniNumber(), restaurant.getEmployees()), entity.getUrlImagen(), entity.getActive());
         }
     throw new DishNotFoundException();
+    }
+
+    @Override
+    public List<Dish> getDishes(Long idRestaurant, int page, int size, Long category) {
+        PageRequest pageRequest = PageRequest.of(page - 1, size, Sort.by("name").ascending());
+        Page<DishEntity> dishPage;
+        if(category == 0L) {
+            dishPage = dishRepository.findAllByRestaurantEntityId(idRestaurant, pageRequest);
+            return dishEntityMapper.toDishList(dishPage.getContent());
+        }
+        dishPage = dishRepository.findAllByRestaurantEntityIdAndCategoryEntityId(idRestaurant, category, pageRequest);
+        return dishEntityMapper.toDishList(dishPage.getContent());
     }
 }

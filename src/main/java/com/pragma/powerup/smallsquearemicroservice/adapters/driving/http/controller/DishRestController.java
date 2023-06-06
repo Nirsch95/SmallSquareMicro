@@ -2,6 +2,7 @@ package com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.contro
 
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.request.DishRequestDto;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.request.DishUpdateRequestDto;
+import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.dto.response.DishResponseDto;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.handlers.IDishHandler;
 import com.pragma.powerup.smallsquearemicroservice.configuration.Constants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -66,5 +68,17 @@ public class DishRestController {
         dishHandler.changeStateDish(id);
         return ResponseEntity.ok()
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_UPDATED_MESSAGE));
+    }
+
+    @Operation(summary = "Get all dishes of the restaurant",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "All dishes of the restaurant",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = DishUpdateRequestDto.class))),
+                    @ApiResponse(responseCode = "404", description = "Dish not found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error"))),
+            })
+    @GetMapping("/all/{idRestaurant}")
+    public ResponseEntity<List<DishResponseDto>> getDishes(@PathVariable Long idRestaurant, @RequestParam("page") int page, @RequestParam("size") int size, @RequestParam("category") Long category){
+        return ResponseEntity.ok(dishHandler.getDishes(idRestaurant, page, size, category));
     }
 }
