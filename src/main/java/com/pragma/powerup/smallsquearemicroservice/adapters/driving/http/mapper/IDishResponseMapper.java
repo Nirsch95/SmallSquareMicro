@@ -15,7 +15,7 @@ public interface IDishResponseMapper {
     @Mapping(target = "idCategory", source = "category.id")
     @Mapping(target = "idRestaurant", source = "restaurant.id")
     DishResponseDto toResponse(Dish dish);
-    @Mapping(target = "idCategory", source = "dish.category.id")
-    @Mapping(target = "idRestaurant", source = "dish.restaurant.id")
+    @Mapping(target = "idCategory", source = "category.id")
+    @Mapping(target = "idRestaurant", source = "restaurant.id")
     List<DishResponseDto> toResponseList(List<Dish> dishList);
 }

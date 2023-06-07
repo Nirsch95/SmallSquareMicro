@@ -46,6 +46,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         endpointRoles.put("/restaurant/add", owner);
         endpointRoles.put("/restaurant", admin);
         endpointRoles.put("/restaurant/all/", client);
+        endpointRoles.put("/order", client);
     }
 
     public String getAuthorizationToken() {

@@ -147,4 +147,11 @@ public class ControllerAdvisor {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, "Error de formato de respuesta"));
         }
     }
+
+    @ExceptionHandler(OrderNotBeCreatedException.class)
+    public ResponseEntity<Map<String, String>> handleOrderNotBeCreatedException(
+            OrderNotBeCreatedException orderNotBeCreatedException) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INVALID_ORDER_MESSAGE));
+    }
 }

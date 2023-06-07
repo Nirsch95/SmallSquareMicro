@@ -1,25 +1,13 @@
 package com.pragma.powerup.smallsquearemicroservice.configuration;
 
-import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.adapter.CategoryMysqlAdapter;
-import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.adapter.DishMysqlAdapter;
-import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.adapter.RestaurantMysqlAdapter;
-import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.mappers.ICategoryEntityMapper;
-import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.mappers.IDishEntityMapper;
-import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.mappers.IRestaurantEntityMapper;
-import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.repositories.ICategoryRepository;
-import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.repositories.IDishRepository;
-import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.repositories.IRestaurantRepository;
+import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.adapter.*;
+import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.mappers.*;
+import com.pragma.powerup.smallsquearemicroservice.adapters.driven.jpa.mysql.repositories.*;
 import com.pragma.powerup.smallsquearemicroservice.adapters.driving.http.adapter.RestTemplateAdapter;
 import com.pragma.powerup.smallsquearemicroservice.configuration.interceptor.JwtInterceptor;
-import com.pragma.powerup.smallsquearemicroservice.domain.api.ICategoryServicePort;
-import com.pragma.powerup.smallsquearemicroservice.domain.api.IDishServicePort;
-import com.pragma.powerup.smallsquearemicroservice.domain.api.IRestaurantServicePort;
-import com.pragma.powerup.smallsquearemicroservice.domain.spi.ICategoryPersistencePort;
-import com.pragma.powerup.smallsquearemicroservice.domain.spi.IDishPersistencePort;
-import com.pragma.powerup.smallsquearemicroservice.domain.spi.IRestaurantPersistencePort;
-import com.pragma.powerup.smallsquearemicroservice.domain.usecase.CategoryUseCase;
-import com.pragma.powerup.smallsquearemicroservice.domain.usecase.DishUseCase;
-import com.pragma.powerup.smallsquearemicroservice.domain.usecase.RestaurantUseCase;
+import com.pragma.powerup.smallsquearemicroservice.domain.api.*;
+import com.pragma.powerup.smallsquearemicroservice.domain.spi.*;
+import com.pragma.powerup.smallsquearemicroservice.domain.usecase.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +23,11 @@ public class BeanConfiguration {
     private final IDishEntityMapper dishEntityMapper;
     private final ICategoryRepository categoryRepository;
     private final ICategoryEntityMapper categoryEntityMapper;
+    private final IOrderRepository orderRepository;
+    private final IOrderEntityMapper orderEntityMapper;
+    private final IOrderDishRepository orderDishRepository;
+    private final IOrderDishEntityMapper orderDishEntityMapper;
+
     private final JwtInterceptor jwtInterceptor;
     private final RestTemplateAdapter restTemplateAdapter;
     @Bean
@@ -67,7 +60,25 @@ public class BeanConfiguration {
         return new CategoryMysqlAdapter(categoryRepository, categoryEntityMapper);
     }
 
+    @Bean
+    public IOrderServicePort orderServicePort(){
+        return new OrderUseCase(orderPersistencePort(), restaurantPersistencePort(), jwtInterceptor);
+    }
 
+    @Bean
+    public IOrderPersistencePort orderPersistencePort(){
+        return new OrderMysqlAdapter(orderRepository, orderEntityMapper);
+    }
+
+    @Bean
+    public IOrderDishServicePort orderDishServicePort(){
+        return new OrderDishUseCase(orderDishPersistencePort());
+    }
+
+    @Bean
+    public IOrderDishPersistencePort orderDishPersistencePort(){
+        return new OrderDishMysqlAdapter(orderDishRepository, orderDishEntityMapper);
+    }
     @Bean
     public RestTemplate getRestTemplate() {
         return new RestTemplate();
